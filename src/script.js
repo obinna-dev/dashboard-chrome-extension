@@ -1,19 +1,18 @@
 
 
-fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=space")
+fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=experimental")
     .then(res => res.json())
     .then(data => {
         document.body.style.backgroundImage = `url(${data.urls.regular})`
         document.querySelector(".image-attribution").innerHTML = `<strong>📸 :</strong> ${data.user.name}`
         console.log(data.urls.regular)
-
     })
     .catch(err => {
         document.body.style.backgroundImage = `url(https://wallpaperaccess.com/full/2972662.png)`
         document.querySelector(".image-attribution").innerHTML = `Oops! Something went wrong 😭`
     })
 
-fetch("https://api.coingecko.com/api/v3/coins/dogecoin")
+fetch("https://api.coingecko.com/api/v3/coins/bitcoin")
     .then(res => res.json())
     .then(data => {
         document.getElementById("crypto-info-container").innerHTML = `
@@ -27,13 +26,34 @@ fetch("https://api.coingecko.com/api/v3/coins/dogecoin")
             <p><span class="fa fa-arrow-down" aria-hidden="true">&nbsp;</span> ₦ ${data.market_data.low_24h.ngn}</p>
         </div>
         `
-        console.log(data)
     })
     .catch(err => {
-        console.log(err)
+        // console.log(err)
     })
 
-const date = new Date()
-console.log(date.toLocaleTimeString("en-us", {timeStyle: "short"}))
+function getTime() {
+    const time = new Date()
+    document.getElementById("time").textContent = time.toLocaleTimeString("en-us", {timeStyle: "medium"})
+}
 
+setInterval(getTime, 1000)
 
+navigator.geolocation.getCurrentPosition(position => {
+    fetch(`https://apis.scrimba.com/openweathermap/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&units=metric`)
+        .then(res => {
+            if (!res.ok) {
+                throw Error ("Oops! Something went wrong. 🫢 Please try again.")
+            } return res.json()
+        })
+        .then(data => {
+            console.log(data)
+            document.getElementById("weather-info-container").innerHTML = `
+            <div class="weather-icon-container"> 
+                <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="weather-icon" class="weather-icon" id="weather-icon"/>
+                <p>${Math.round(data.main.temp)}°</p>
+            </div>
+            <p><strong>${data.name}</strong></p>
+            `
+        })
+        .catch(err => {console.log("Error! Please try again.")})
+})
